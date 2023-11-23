@@ -1,4 +1,4 @@
-
+from time import sleep
 class Poller:
     def __init__(self, intance_manager_address, proxy_list=[]) -> None:
         """
@@ -11,3 +11,22 @@ class Poller:
         for proxy in proxy_list:
             #TODO:
             pass
+    
+    def poll_instance_manager(self):
+        #TODO:
+        pass
+
+    def poll_proxies(self):
+        """ 
+        get_proxy_list
+        poll them
+        update
+        """
+
+    def run(self):
+        while (True):
+            self.poll_instance_manager()
+            self.poll_proxies()
+
+            # TODO: Choose sleep duration
+            sleep()
