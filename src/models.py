@@ -9,9 +9,9 @@ class ProxyModel:
         self.avg_throughput = avg_throughput
 
 class ClientModel:
-    def __init__(self, ip: str, firt_request: datetime, request_count=0) -> None:
+    def __init__(self, ip: str, first_request: datetime, request_count=0) -> None:
         self.ip = ip
-        self.firt_request = firt_request
+        self.first_request = first_request
         self.request_count = request_count
     
     @classmethod

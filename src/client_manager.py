@@ -13,11 +13,11 @@ def index():
     client = dao.find_client(client_ip)
     if not client:
         print('did not find, doing a search')
-        new_client = ClientModel(client_ip, datetime.now(), 1)
+        new_client = ClientModel(client_ip, datetime.now(), 0)
         dao.add_client(new_client)
         client = dao.find_client(client_ip)
 
-    return f'Client IP: {client_ip}\nResult: {client.firt_request}'
+    return f'Client IP: {client.first_request} \nResult: {client.first_request}'
 
 def client_manager_server():
     app.run(debug=True, host="0.0.0.0", port=5001)

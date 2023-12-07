@@ -47,7 +47,7 @@ class DAO:
         self.__execute_query__(PROXIES_INSERT_VALUES_QUERY.format(proxy.url, proxy.created_at, proxy.utility, proxy.connected_users, proxy.avg_throughput))
 
     def add_client(self, client:ClientModel):
-        self.__execute_query__(CLIENTS_INSERT_VALUES_QUERY.format(client.ip, client.firt_request, client.request_count))
+        self.__execute_query__(CLIENTS_INSERT_VALUES_QUERY.format(client.ip, client.first_request, client.request_count))
         pass
 
     def find_client(self, ip) -> ClientModel:
