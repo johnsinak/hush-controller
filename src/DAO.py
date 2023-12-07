@@ -46,9 +46,19 @@ class DAO:
     def add_proxy(self, proxy:ProxyModel):
         self.__execute_query__(PROXIES_INSERT_VALUES_QUERY.format(proxy.url, proxy.created_at, proxy.utility, proxy.connected_users, proxy.avg_throughput))
 
+    def get_proxies(self) -> list:
+        results = self.__execute_search__(PROXIES_GET_ALL_VALUES)
+        proxies = []
+        for row in results:
+            proxies.append(ProxyModel.from_list(row))
+        return proxies
+
     def add_client(self, client:ClientModel):
         self.__execute_query__(CLIENTS_INSERT_VALUES_QUERY.format(client.ip, client.first_request, client.request_count))
         pass
+
+    def update_client(self, client:ClientModel):
+        self.__execute_query__(CLIENTS_UPDATE_VALUES_QUERY.format(client.request_count, client.ip))
 
     def find_client(self, ip) -> ClientModel:
         results = self.__execute_search__(CLIENTS_SEARCH_VALUES.format(ip))
@@ -58,4 +68,4 @@ class DAO:
             return None
 
     def add_connection(self, proxy:ProxyModel, client:ClientModel):
-        pass
+        self.__execute_query__(CONNECTIONS_INSERT_VALUES_QUERY.format(proxy.id, client.ip, datetime.now(), 0))

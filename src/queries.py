@@ -16,6 +16,8 @@ PROXIES_INSERT_VALUES_QUERY = """
                 ('{}', '{}', {}, {}, {});
             """
 
+PROXIES_GET_ALL_VALUES = """SELECT * FROM proxies"""
+
 CLIENTS_TABLE_CREATION_QUERY = """
             CREATE TABLE IF NOT EXISTS clients (
             ip TEXT PRIMARY KEY,
@@ -29,6 +31,12 @@ CLIENTS_INSERT_VALUES_QUERY = """
                 clients (ip, first_request, request_count)
             VALUES
                 ('{}', '{}', {});
+            """
+
+CLIENTS_UPDATE_VALUES_QUERY = """
+            UPDATE clients
+            SET request_count = {}
+            WHERE ip = '{}'
             """
 
 CLIENTS_SEARCH_VALUES = """SELECT * FROM clients WHERE ip LIKE '{}'"""
@@ -46,7 +54,7 @@ CONNECTIONS_TABLE_CREATION_QUERY = """
 
 CONNECTIONS_INSERT_VALUES_QUERY = """
             INSERT INTO
-                connections (proxy_id, client_ip, request_count, request_time, is_active)
+                connections (proxy_id, client_ip, request_time, is_active)
             VALUES
-                ({}, '{}', {}, '{}', {});
+                ({}, '{}', '{}', {});
             """
