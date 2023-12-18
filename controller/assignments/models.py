@@ -21,7 +21,7 @@ class Proxy(models.Model):
 
 
 class Client(models.Model):
-    ip = models.CharField(max_length=30, null=False)
+    ip = models.CharField(max_length=30, null=False, unique=True, primary_key=True)
     user_agent = models.CharField(max_length=255, null=True, blank=True)
 
 
@@ -61,4 +61,3 @@ class Assignment(models.Model):
         related_name="assigned",
     )
     created_at = models.DateTimeField(auto_now_add=True)
-
