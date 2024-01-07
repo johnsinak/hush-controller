@@ -52,6 +52,9 @@ The broker is the main component that is in charge of assigning proxies to clien
 
 In this paper we decided to use the proxy assignment algorithm introduced in this \cite{nasr2019enemy} work by Nasr et al. To implement this paper, we used the same formula and attributes they used in their evaluation. All the information needed for the calculation of those features are extracted from the entries in the dataset.
 
+\section{How to decouple the broker and the controller}
+To detach the broker and controller systems, one can easily use a third node for a database and then give access to the detached broker and controller systems.
+
 \printbibliography
 
 \end{document}
