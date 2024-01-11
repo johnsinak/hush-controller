@@ -36,9 +36,14 @@ In this section we will go over the overall design patters used in designing the
 \end{figure}
 
 \subsection{Designing the Controller}
-The controller is in charge of getting information from underlying parties (such as the instance manager and proxies), and updating the database accordingly. The controller gathers these information by periodically polling data endpoints on the proxies and the instance manager. After gathering data, the controller stores them in a database that can be also accessed by the broker. This data will later be used by the broker to assign proxies to clients.
+The controller is in charge of getting information from underlying parties (such as the instance manager and proxies), and updating the database accordingly. The controller gathers these information by periodically polling data endpoints on the proxies and the instance manager. The instance manager and the controller communicate using to different endpoints:
 
-The controller has a database. This database follows a simple relational schema is seen in figure~\ref*{fig:schema}
+\begin{itemize}
+    \item \textbf{A GET endpoint on the instance manager}: for the controller to query and pull information from when it's first starting to gather the initial data regarding current available proxies. The controller uses the gathered data to initialize it's database.
+    \item \textbf{A POST endpoint on the controller}: for the instance manager (and the rejuvenation algorithm) to post (or in other words, push) new changes to available proxies, migrations, and reclaims. After the new data is posted to the controller, it rearranges it's users accordingly and gives them migration notices.
+\end{itemize}
+
+After gathering data, the controller stores them in a database that can be also accessed by the broker. This data will later be used by the broker to assign proxies to clients. This database follows a simple relational schema is seen in figure~\ref*{fig:schema}
 
 \begin{figure}[h]
     \centering
@@ -46,6 +51,8 @@ The controller has a database. This database follows a simple relational schema 
     \caption{database schema}
     \label{fig:schema}
 \end{figure}
+
+Since the database was an important component of the controller, we decided to against using the famous Flask library to implement our web server, and instead chose the more complex alternative Django \cite{noauthor_django_nodate}. Django offers a great internal ORM which is fast and secure, which can help managing the database a much more streamlined process.
 
 \subsection{Designing the Broker}
 The broker is the main component that is in charge of assigning proxies to client. Our broker is designed in a way that can easily be integrated with any proxy assignment algorithm.
