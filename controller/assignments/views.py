@@ -34,11 +34,12 @@ class AssignmentView(APIView):
             active_proxies = Proxy.objects.filter(is_blocked=False, is_active=True, capacity__gt=0).all()
             chosen_proxy = active_proxies[randint(0,len(active_proxies) - 1)]
             Assignment.objects.create(proxy=chosen_proxy, client=client)
-            return Response(data=f"{chosen_proxy.url}", status=status.HTTP_200_OK)
+            chosen_proxy.capacity -= 1
+            chosen_proxy.save()
+            return Response(data=f"{chosen_proxy.ip}", status=status.HTTP_200_OK)
 
         # ################ Enem19 implementation ################
 
-        # #TODO: Do we have to block users in some way? that seems odd!
         active_proxies = Proxy.objects.filter(is_blocked=False, is_active=True, capacity__gt=0).all()
         client_assignments = Assignment.objects.filter(client=client)
         known_blocked_proxies_for_client = client_assignments.values('proxy').filter(is_blocked=True)
@@ -53,15 +54,45 @@ class AssignmentView(APIView):
         proxy_utilization = ProxyReport.objects.filter(connected_clients__value=client).count()
 
         utility_values_for_client = []
-
-        #TODO:
         alpha1, alpha2, alpha3, alpha4, alpha5 = 1,1,1,1,1
         some_cap_value = 50
         for proxy in active_proxies:
-            distance = 0
-            proxy_utility = alpha1 * min(proxy_utilization, some_cap_value) - \
-                            alpha2 * number_of_requests_for_new_proxies - \
-                            alpha3 * blocked_proxy_usage - \
-                            alpha4 * number_of_blocked_proxies_that_a_user_knows - \
-                            alpha5 * distance
+            distance = geodesic((proxy.latitude, proxy.longitude), (client.latitude, client.longitude)).kilometers
+            proxy_utility = alpha1 * min(proxy_utilization, some_cap_value) \
+                            - alpha2 * number_of_requests_for_new_proxies \
+                            - alpha3 * blocked_proxy_usage \
+                            - alpha4 * number_of_blocked_proxies_that_a_user_knows \
+                            - alpha5 * distance
+            utility_values_for_client.append(proxy_utility)
+        
+        utility_values_for_proxies = []
+        beta1, beta2, beta3, beta4 = 1,1,1,1
+        for proxy in active_proxies:
+            distance = geodesic((proxy.latitude, proxy.longitude), (client.latitude, client.longitude)).kilometers
+            number_of_connected_clients = ProxyReport.objects.filter(proxy=proxy).last().connected_clients.count()
+            number_of_clients_who_know_the_proxy = Assignment.objects.filter(proxy=proxy).values('client').distinct().count()
+            total_utilization_of_proxy_for_users = 0
+            client_utility =  beta1 * number_of_clients_who_know_the_proxy \
+                            + beta2 * number_of_connected_clients \
+                            + beta3 * total_utilization_of_proxy_for_users \
+                            - alpha4 * distance
+            utility_values_for_proxies.append(client_utility)
 
+        mults = []
+        for i in range(len(utility_values_for_client)):
+            mults.append(utility_values_for_client[i] * utility_values_for_proxies[i])
+
+        chosen_proxy = active_proxies[mults.index(max(mults))]
+        Assignment.objects.create(proxy=chosen_proxy, client=client)
+        chosen_proxy.capacity -= 1
+        chosen_proxy.save()
+        return Response(data=f"{chosen_proxy.ip}", status=status.HTTP_200_OK)
+
+class ProxyUpdateView(APIView):
+    """
+    submit a change to the proxy infrastructure
+    """
+
+    def post(self, request: Request):
+        # TODO: do some shit with this
+        request.data
