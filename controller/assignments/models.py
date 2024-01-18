@@ -27,10 +27,9 @@ class ProxyManager(models.Manager):
 
 
 class Proxy(models.Model):
-    url = models.CharField(max_length=100, null=False)
+    url = models.CharField(max_length=100, null=True)
     ip = models.CharField(max_length=30, null=False)
     created_at = models.DateTimeField(auto_now_add=True)
-    # TODO: fix this
     capacity = models.IntegerField(default=40)
     is_blocked = models.BooleanField(default=False)
     is_active = models.BooleanField(default=True)
