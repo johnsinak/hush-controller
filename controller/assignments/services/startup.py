@@ -4,7 +4,7 @@ import requests
 
 def startup():
     if Proxy.objects.all().count() != 0:
-        #TODO: can be changed if needed
+        #Note: can be changed if needed
         print('database is already populated')
         return
     
@@ -20,3 +20,5 @@ def startup():
 
     poller_thread = poller_threads.PollerThread()
     poller_thread.start()
+
+    #TODO: Add a system for migrations and stuff, since we don't have the push for the current test

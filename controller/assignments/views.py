@@ -30,7 +30,7 @@ class AssignmentView(APIView):
             client = Client.objects.get(ip=user_ip)
         except ObjectDoesNotExist:
             client = Client.objects.create(ip=user_ip, user_agent=user_device)
-            # TODO: provide with random proxy and done. discuss this
+            # provide with random proxy and done. discuss this
             active_proxies = Proxy.objects.filter(is_blocked=False, is_active=True, capacity__gt=0).all()
             chosen_proxy = active_proxies[randint(0,len(active_proxies) - 1)]
             Assignment.objects.create(proxy=chosen_proxy, client=client)
@@ -94,5 +94,5 @@ class ProxyUpdateView(APIView):
     """
 
     def post(self, request: Request):
-        # TODO: do some shit with this
+        # TODO: Later - do some shit with this
         request.data
