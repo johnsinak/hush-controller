@@ -11,9 +11,12 @@ def startup():
     INSTANCE_INFO_URL = "http://44.197.203.24:8000/getInitDetails"
 
     response = requests.get(INSTANCE_INFO_URL)
-    
-    #TODO: somehow create into a list
-    proxy_ip_list = response.json()
+
+    response_dict = dict(response.json())
+    proxy_ip_list = []
+
+    for key in response_dict.keys():
+        proxy_ip_list.append(response_dict[key]['PublicIpAddress'])
     
     for ip in proxy_ip_list:
         Proxy.objects.create(ip=ip)
