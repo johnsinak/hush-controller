@@ -6,5 +6,6 @@ urlpatterns = [
     path("getnew", views.AssignmentView.as_view(), name="assignment"),
     path("postupdate", views.ProxyUpdateView.as_view(), name="postupdate"),
     path("getid", views.IDAssignmentView.as_view(), name="getid"),
-    path("postavgclient", views.ClientAvgPostView.as_view(), name="postavgclient")
+    path("postavgclient", views.ClientAvgPostView.as_view(), name="postavgclient"),
+    path("postavgproxy", views.ProxyAvgPostView.as_view(), name="postavgproxy")
 ]

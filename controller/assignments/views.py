@@ -131,3 +131,20 @@ class ClientAvgPostView(APIView):
         obj = ClientAvgMigrationTime.objects.create(client_ip=user_ip, value=avg_time)
 
         return Response(data=f"created, val: {obj.value}!", status=status.HTTP_200_OK)
+
+
+class ProxyAvgPostView(APIView):
+    """
+    submit average time of migration for proxy
+    """
+
+    def post(self, request: Request):
+        try:
+            avg_time = float(request.data['avg'])
+            proxy_ip = request.META.get('REMOTE_ADDR', None)
+        except:
+            return Response(data=f"bad request", status=status.HTTP_400_BAD_REQUEST)
+        
+        obj = ProxyAvgMigrationTime.objects.create(proxy_ip=proxy_ip, value=avg_time)
+
+        return Response(data=f"created, val: {obj.value}!", status=status.HTTP_200_OK)
