@@ -104,7 +104,7 @@ class IDAssignmentView(APIView):
     """
 
     def get(self, request: Request):
-        new_id = IDClientCounter.objects.count() + 1
+        new_id = IDClientCounter.objects.count() + 3
         IDClientCounter.objects.create()
 
 
