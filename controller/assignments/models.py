@@ -28,13 +28,13 @@ class ProxyManager(models.Manager):
 
 class Proxy(models.Model):
     url = models.CharField(max_length=100, null=True)
-    ip = models.CharField(max_length=30, null=False)
+    ip = models.CharField(max_length=30, null=False, default='0.0.0.0')
     created_at = models.DateTimeField(auto_now_add=True)
     capacity = models.IntegerField(default=40)
     is_blocked = models.BooleanField(default=False)
     is_active = models.BooleanField(default=True)
-    latitude = models.FloatField()
-    longitude = models.FloatField()
+    latitude = models.FloatField(null=True)
+    longitude = models.FloatField(null=True)
 
     objects = ProxyManager()
 
@@ -57,8 +57,8 @@ class ClientManager(models.Manager):
 class Client(models.Model):
     ip = models.CharField(max_length=30, null=False, unique=True, primary_key=True)
     user_agent = models.CharField(max_length=255, null=True, blank=True)
-    latitude = models.FloatField()
-    longitude = models.FloatField()
+    latitude = models.FloatField(null=True)
+    longitude = models.FloatField(null=True)
 
     objects = ClientManager()
 
@@ -97,4 +97,8 @@ class Assignment(models.Model):
         on_delete=models.CASCADE,
         related_name="assigned",
     )
+    created_at = models.DateTimeField(auto_now_add=True)
+
+
+class IDClientCounter(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
