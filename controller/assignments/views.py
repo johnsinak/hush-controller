@@ -94,5 +94,23 @@ class ProxyUpdateView(APIView):
     """
 
     def post(self, request: Request):
-        # TODO: Later - do some shit with this
+        # TODO: Later - do some with this
         request.data
+
+
+class IDAssignmentView(APIView):
+    """
+    submit a change to the proxy infrastructure
+    """
+
+    def get(self, request: Request):
+        new_id = IDClientCounter.objects.count() + 1
+        IDClientCounter.objects.create()
+
+
+        return Response(data=f"{new_id}", status=status.HTTP_200_OK)
+
+    def post(self, request: Request):
+        IDClientCounter.objects.all().delete()
+
+        return Response(data=f"everything nuked!", status=status.HTTP_200_OK)
