@@ -102,3 +102,15 @@ class Assignment(models.Model):
 
 class IDClientCounter(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
+
+
+class ClientAvgMigrationTime(models.Model):
+    value = models.FloatField()
+    client_ip = models.CharField(max_length=30)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+
+class ProxyAvgMigrationTime(models.Model):
+    value = models.FloatField()
+    proxy_ip = models.CharField(max_length=30)
+    created_at = models.DateTimeField(auto_now_add=True)

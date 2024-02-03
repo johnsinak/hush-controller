@@ -114,3 +114,20 @@ class IDAssignmentView(APIView):
         IDClientCounter.objects.all().delete()
 
         return Response(data=f"everything nuked!", status=status.HTTP_200_OK)
+
+
+class ClientAvgPostView(APIView):
+    """
+    submit average time of migration for proxy
+    """
+
+    def post(self, request: Request):
+        try:
+            avg_time = float(request.data['avg'])
+            user_ip = request.META.get('REMOTE_ADDR', None)
+        except:
+            return Response(data=f"bad request", status=status.HTTP_400_BAD_REQUEST)
+        
+        obj = ClientAvgMigrationTime.objects.create(client_ip=user_ip, value=avg_time)
+
+        return Response(data=f"created, val: {obj.value}!", status=status.HTTP_200_OK)
