@@ -1,10 +1,10 @@
-from assignments.models import *
-from assignments.services import poller_threads
-from assignments.services import test_threads
 import requests
-from time import time
+import threading
+from time import time, sleep
 
 def startup():
+    from assignments.models import Proxy
+    from assignments.services import poller_threads
     if Proxy.objects.all().count() != 0:
         #Note: can be changed if needed
         print('database is already populated')
@@ -35,6 +35,7 @@ def id_to_nums(id):
 
 
 def setup_test_db(test_config):
+    from assignments.models import Proxy, Client, Assignment
     MIGRATION_COUNT = 10
     client_count = test_config[0]
     proxy_count = test_config[1]
@@ -53,10 +54,11 @@ def setup_test_db(test_config):
 
 
 def test_startup():
-    TEST_SIZE_C_P = [(100,10), (500,50), (1000,100), (2000,200), (5000,50)]
-    test_config = (100,10)
-    setup_test_db(test_config)
+        from assignments.services import test_threads
+        TEST_SIZE_C_P = [(100,10), (500,50), (1000,100), (2000,200), (5000,50)]
+        test_config = (100,10)
+        setup_test_db(test_config)
 
-    poster_thread = test_threads.UpdatePosterThread(test_config[1])
-    poster_thread.start()
+        poster_thread = test_threads.UpdatePosterThread(test_config[1])
+        poster_thread.start()
 
