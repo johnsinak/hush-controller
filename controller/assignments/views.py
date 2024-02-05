@@ -8,9 +8,11 @@ from rest_framework.request import Request
 from rest_framework.permissions import IsAuthenticated
 from rest_framework import status
 from rest_framework.parsers import MultiPartParser
+from assignments.services.startup import id_to_nums
 from random import randint
 from geopy.distance import geodesic
 from time import time
+import socket
 
 from assignments.models import *
 
@@ -96,9 +98,30 @@ class ProxyUpdateView(APIView):
 
     def post(self, request: Request):
         # TODO: Migrating everything for now, fix later maybe!
-        id = request.data['source_id']
-        
-        return Response(data=f"Updated assignments and sent migration info!", status=status.HTTP_200_OK)
+        start_time = time()
+        source_id = request.data['source_id']
+        proxy_len = request.data['proxy_len']
+        base_proxy_ip = '1.{}.{}.{}'
+
+        for proxy_id in range(proxy_len):
+            num1, num2 = id_to_nums(proxy_id)
+            proxy_ip = base_proxy_ip.format(num1, num2, source_id)
+            proxy = Proxy.objects.get(ip=proxy_ip)
+            clients = Assignment.objects.filter(proxy=proxy).values_list('client', flat=True)
+            print(clients)
+            new_proxy_ip = base_proxy_ip.format(num1, num2, source_id + 1)
+            new_proxy = Proxy.objects.get(ip=new_proxy_ip)
+            for client in clients:
+                Assignment.objects.create(client=client, proxy=new_proxy)
+                migration_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+                migration_socket.connect(("54.145.21.93", 8000))
+                migration_socket.send(f"migrate {new_proxy_ip}".encode())
+                migration_socket.close()
+
+        duration = time() - start_time
+        ControllerAvgMigrationTime.objects.create(value=duration)
+
+        return Response(data=f"Updated assignments and sent migration info! duration: {duration}", status=status.HTTP_200_OK)
         
 
 
