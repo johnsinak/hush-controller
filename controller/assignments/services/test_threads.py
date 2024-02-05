@@ -12,11 +12,12 @@ class UpdatePosterThread(threading.Thread):
 
     def run(self):
         print(f"==== test migration sender running...")
+        start_time = time()
         TESTING_MIGRATION_TIMES = [10, 20, 30, 40, 50, 60, 70, 80, 90, 100]
         counters = [0] * len(TESTING_MIGRATION_TIMES)
         is_done = 0
         while True:
-            right_now = time() - self.start_time
+            right_now = time() - start_time
 
             for i in range(len(TESTING_MIGRATION_TIMES) - 1, -1, -1):
                 if TESTING_MIGRATION_TIMES[i] < right_now and counters[i] == 0:
