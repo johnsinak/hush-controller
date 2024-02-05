@@ -15,7 +15,7 @@ class UpdatePosterThread(threading.Thread):
         start_time = time()
         TESTING_MIGRATION_TIMES = []
         for i in range(10):
-            TESTING_MIGRATION_TIMES.append(i*20 + 10)
+            TESTING_MIGRATION_TIMES.append(i*30 + 10)
         counters = [0] * len(TESTING_MIGRATION_TIMES)
         is_done = 0
         while True:
