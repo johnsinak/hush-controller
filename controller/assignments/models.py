@@ -18,7 +18,6 @@ class ProxyManager(models.Manager):
     def create(self, **kwargs):
         proxy_ip = kwargs.get('ip', None)
         is_test = kwargs.get('is_test', None)
-        print(is_test)
         if proxy_ip is not None and is_test is not True:
             latitude, longitude = get_ip_location(proxy_ip)
             kwargs['latitude'] = latitude
