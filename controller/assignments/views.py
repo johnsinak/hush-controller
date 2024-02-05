@@ -111,7 +111,8 @@ class ProxyUpdateView(APIView):
             print(clients)
             new_proxy_ip = base_proxy_ip.format(num1, num2, source_id + 1)
             new_proxy = Proxy.objects.get(ip=new_proxy_ip)
-            for client in clients:
+            for client_ip in clients:
+                client = Client.objects.get(ip=client_ip)
                 Assignment.objects.create(client=client, proxy=new_proxy)
                 migration_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
                 migration_socket.connect(("54.145.21.93", 8000))
