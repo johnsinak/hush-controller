@@ -17,10 +17,14 @@ def get_ip_location(ip: str):
 class ProxyManager(models.Manager):
     def create(self, **kwargs):
         proxy_ip = kwargs.get('ip', None)
-        if proxy_ip is not None:
+        is_test = kwargs.get('is_test', None)
+        if proxy_ip is not None and is_test is not True:
             latitude, longitude = get_ip_location(proxy_ip)
             kwargs['latitude'] = latitude
             kwargs['longitude'] = longitude
+        else:
+            kwargs['latitude'] = 0.0
+            kwargs['longitude'] = 0.0
         instance = super().create(**kwargs)
 
         return instance
@@ -29,6 +33,7 @@ class ProxyManager(models.Manager):
 class Proxy(models.Model):
     url = models.CharField(max_length=100, null=True)
     ip = models.CharField(max_length=30, null=False, default='0.0.0.0')
+    is_test = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
     capacity = models.IntegerField(default=40)
     is_blocked = models.BooleanField(default=False)
@@ -45,10 +50,14 @@ class Proxy(models.Model):
 class ClientManager(models.Manager):
     def create(self, **kwargs):
         user_ip = kwargs.get('ip', None)
-        if user_ip is not None:
+        is_test = kwargs.get('is_test', None)
+        if user_ip is not None and is_test is not True:
             latitude, longitude = get_ip_location(user_ip)
             kwargs['latitude'] = latitude
             kwargs['longitude'] = longitude
+        else:
+            kwargs['latitude'] = 0.0
+            kwargs['longitude'] = 0.0
         instance = super().create(**kwargs)
 
         return instance
@@ -56,6 +65,7 @@ class ClientManager(models.Manager):
 
 class Client(models.Model):
     ip = models.CharField(max_length=30, null=False, unique=True, primary_key=True)
+    is_test = models.BooleanField(default=True)
     user_agent = models.CharField(max_length=255, null=True, blank=True)
     latitude = models.FloatField(null=True)
     longitude = models.FloatField(null=True)
