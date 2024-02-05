@@ -108,7 +108,6 @@ class ProxyUpdateView(APIView):
             proxy_ip = base_proxy_ip.format(num1, num2, source_id)
             proxy = Proxy.objects.get(ip=proxy_ip)
             clients = Assignment.objects.filter(proxy=proxy).values_list('client', flat=True)
-            print(clients)
             new_proxy_ip = base_proxy_ip.format(num1, num2, source_id + 1)
             new_proxy = Proxy.objects.get(ip=new_proxy_ip)
             for client_ip in clients:
