@@ -57,6 +57,7 @@ def test_startup():
         from assignments.services import test_threads
         TEST_SIZE_C_P = [(100,10), (500,50), (1000,100), (2000,200), (5000,50)]
         test_config = TEST_SIZE_C_P[1]
+        print(f'going with {test_config[0]}c{test_config[1]}p')
         setup_test_db(test_config)
 
         poster_thread = test_threads.UpdatePosterThread(test_config[1])
