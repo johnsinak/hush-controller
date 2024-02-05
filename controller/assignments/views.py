@@ -10,6 +10,7 @@ from rest_framework import status
 from rest_framework.parsers import MultiPartParser
 from random import randint
 from geopy.distance import geodesic
+from time import time
 
 from assignments.models import *
 
@@ -94,8 +95,11 @@ class ProxyUpdateView(APIView):
     """
 
     def post(self, request: Request):
-        # TODO: Later - do some with this
-        request.data
+        # TODO: Migrating everything for now, fix later maybe!
+        id = request.data['source_id']
+        
+        return Response(data=f"Updated assignments and sent migration info!", status=status.HTTP_200_OK)
+        
 
 
 class IDAssignmentView(APIView):
