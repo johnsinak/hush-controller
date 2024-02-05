@@ -57,6 +57,6 @@ def test_startup():
     test_config = (100,10)
     setup_test_db(test_config)
 
-    poster_thread = test_threads.UpdatePosterThread()
+    poster_thread = test_threads.UpdatePosterThread(test_config[1])
     poster_thread.start()
 
