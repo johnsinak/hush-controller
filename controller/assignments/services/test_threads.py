@@ -31,3 +31,9 @@ class UpdatePosterThread(threading.Thread):
                     is_done += 1
             if is_done == len(TESTING_MIGRATION_TIMES):break
         print('migation work is done.')
+        from assignments.models import ControllerAvgMigrationTime
+        from django.db.models import Sum
+
+        print(ControllerAvgMigrationTime.objects.all().values_list('value', flat=True))
+
+        print(ControllerAvgMigrationTime.objects.aggregate(Sum('value'))['value__sum'] / ControllerAvgMigrationTime.objects.count())
