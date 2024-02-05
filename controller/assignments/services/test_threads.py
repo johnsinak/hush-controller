@@ -22,7 +22,7 @@ class UpdatePosterThread(threading.Thread):
                 if TESTING_MIGRATION_TIMES[i] < right_now and counters[i] == 0:
                     # TESTING_MIGRATION_DESTS
                     print(f'sending to {i} to migrate to {i+1}')
-                    url = f'http://3.91.73.130:8000/assignments/postavgclient'
+                    url = f'http://3.91.73.130:8000/assignments/postupdate'
                     data = {"source_id": i, "proxy_len": self.test_size}
                     response = requests.post(url, json=data)
 
