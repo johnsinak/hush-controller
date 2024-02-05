@@ -124,3 +124,8 @@ class ProxyAvgMigrationTime(models.Model):
     value = models.FloatField()
     proxy_ip = models.CharField(max_length=30)
     created_at = models.DateTimeField(auto_now_add=True)
+
+
+class ControllerAvgMigrationTime(models.Model):
+    value = models.FloatField()
+    created_at = models.DateTimeField(auto_now_add=True)
