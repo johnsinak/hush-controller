@@ -113,10 +113,10 @@ class ProxyUpdateView(APIView):
             for client_ip in clients:
                 client = Client.objects.get(ip=client_ip)
                 Assignment.objects.create(client=client, proxy=new_proxy)
-                migration_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-                migration_socket.connect(("54.145.21.93", 8000))
-                migration_socket.send(f"migrate {new_proxy_ip}".encode())
-                migration_socket.close()
+            migration_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            migration_socket.connect(("54.145.21.93", 8000))
+            migration_socket.send(f"migrate {new_proxy_ip}".encode())
+            migration_socket.close()
 
         duration = time() - start_time
         ControllerAvgMigrationTime.objects.create(value=duration)
