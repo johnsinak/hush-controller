@@ -45,11 +45,11 @@ def setup_test_db(test_config):
 
     for i in range(proxy_count):
         num1, num2 = id_to_nums(i)
-        main_proxy = Proxy.objects.create(ip=f'1.{num1}.{num2}.{0}')
+        main_proxy = Proxy.objects.create(ip=f'1.{num1}.{num2}.{0}', is_test=True)
         for i in range(MIGRATION_COUNT):
-            Proxy.objects.create(ip=f'1.{num1}.{num2}.{i+1}')
+            Proxy.objects.create(ip=f'1.{num1}.{num2}.{i+1}', is_test=True)
         for i in range(clinet_per_proxy):
-            client = Client.objects.create(ip=f'2.{num1}.{num2}.{i+1}')
+            client = Client.objects.create(ip=f'2.{num1}.{num2}.{i+1}', is_test=True)
             Assignment.objects.create(proxy=main_proxy, client=client)
 
 
