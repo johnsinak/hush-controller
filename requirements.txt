@@ -4,6 +4,7 @@ certifi==2023.11.17
 charset-normalizer==3.3.2
 click==8.1.7
 Django==5.0
+django-extensions==3.2.3
 djangorestframework==3.14.0
 Flask==3.0.0
 geographiclib==2.0
