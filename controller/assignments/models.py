@@ -5,7 +5,8 @@ from django.contrib.auth.models import (
     PermissionsMixin,
 )
 import requests
-
+from scripts.config_basic import WORLD_SIZE, CENSORED_REGION_SIZE
+from random import random
 
 def get_ip_location(ip: str):
     base_url = f"http://ipapi.co/{ip}/json/"
@@ -18,15 +19,19 @@ class ProxyManager(models.Manager):
     def create(self, **kwargs):
         proxy_ip = kwargs.get('ip', None)
         is_test = kwargs.get('is_test', None)
-        if proxy_ip is not None and is_test is not True:
-            latitude, longitude = get_ip_location(proxy_ip)
-            kwargs['latitude'] = latitude
-            kwargs['longitude'] = longitude
-        else:
-            kwargs['latitude'] = 0.0
-            kwargs['longitude'] = 0.0
-        instance = super().create(**kwargs)
+        while True:
+            latitude = (random() * WORLD_SIZE) - (WORLD_SIZE // 2)
+            if latitude < -CENSORED_REGION_SIZE or latitude > CENSORED_REGION_SIZE:
+                break
+        kwargs['latitude'] = latitude
 
+        while True:
+            longitude = (random() * WORLD_SIZE) - (WORLD_SIZE // 2)
+            if longitude < -CENSORED_REGION_SIZE or longitude > CENSORED_REGION_SIZE:
+                break
+        kwargs['longitude'] = longitude
+
+        instance = super().create(**kwargs)
         return instance
 
 
@@ -51,13 +56,10 @@ class ClientManager(models.Manager):
     def create(self, **kwargs):
         user_ip = kwargs.get('ip', None)
         is_test = kwargs.get('is_test', None)
-        if user_ip is not None and is_test is not True:
-            latitude, longitude = get_ip_location(user_ip)
-            kwargs['latitude'] = latitude
-            kwargs['longitude'] = longitude
-        else:
-            kwargs['latitude'] = 0.0
-            kwargs['longitude'] = 0.0
+
+        kwargs['latitude'] = (random() * CENSORED_REGION_SIZE * 2) - CENSORED_REGION_SIZE
+        kwargs['longitude'] = (random() * CENSORED_REGION_SIZE * 2) - CENSORED_REGION_SIZE
+
         instance = super().create(**kwargs)
 
         return instance
