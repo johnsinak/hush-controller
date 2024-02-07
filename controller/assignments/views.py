@@ -9,14 +9,20 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework import status
 from rest_framework.parsers import MultiPartParser
 from assignments.services.startup import id_to_nums
+from scripts.config_basic import CENSORED_REGION_SIZE
 from random import randint
-from geopy.distance import geodesic
 from time import time
 import socket
 
 from assignments.models import *
 
 
+def calcualte_distance(point_1, point_2):
+    return ((point_1[0] - point_2[0])**2 + (point_1[1] - point_2[1])**2)**0.5
+
+
+def get_normalized_distance(point_1, point_2):
+    return calcualte_distance(point_1, point_2) / CENSORED_REGION_SIZE
 
 class AssignmentView(APIView):
     """
@@ -60,7 +66,7 @@ class AssignmentView(APIView):
         alpha1, alpha2, alpha3, alpha4, alpha5 = 1,1,1,1,1
         some_cap_value = 50
         for proxy in active_proxies:
-            distance = geodesic((proxy.latitude, proxy.longitude), (client.latitude, client.longitude)).kilometers
+            distance = get_normalized_distance((proxy.latitude, proxy.longitude), (client.latitude, client.longitude))
             proxy_utility = alpha1 * min(proxy_utilization, some_cap_value) \
                             - alpha2 * number_of_requests_for_new_proxies \
                             - alpha3 * blocked_proxy_usage \
@@ -71,14 +77,14 @@ class AssignmentView(APIView):
         utility_values_for_proxies = []
         beta1, beta2, beta3, beta4 = 1,1,1,1
         for proxy in active_proxies:
-            distance = geodesic((proxy.latitude, proxy.longitude), (client.latitude, client.longitude)).kilometers
+            distance = get_normalized_distance((proxy.latitude, proxy.longitude), (client.latitude, client.longitude))
             number_of_connected_clients = ProxyReport.objects.filter(proxy=proxy).last().connected_clients.count()
             number_of_clients_who_know_the_proxy = Assignment.objects.filter(proxy=proxy).values('client').distinct().count()
             total_utilization_of_proxy_for_users = 0
             client_utility =  beta1 * number_of_clients_who_know_the_proxy \
                             + beta2 * number_of_connected_clients \
                             + beta3 * total_utilization_of_proxy_for_users \
-                            - alpha4 * distance
+                            - beta4 * distance
             utility_values_for_proxies.append(client_utility)
 
         mults = []
