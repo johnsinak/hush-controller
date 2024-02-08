@@ -11,12 +11,12 @@ CENSOR_UTILIZATION_RATIO = 0.4
 
 ############ RATES ############
 # for our reference: TIME_UNIT = 2 hour
-NEW_USER_RATE_INTERVAL = 3 # 1 user every 2 unit
+NEW_USER_RATE_INTERVAL = 2 # 1 user every 2 unit
 NEW_USER_COUNT = 1
 
-NEW_PROXY_INTERVAL = 100 # 1 every 50 hours
+NEW_PROXY_INTERVAL = 50 # 1 every 50 hours
 NEW_PROXY_COUNT = 1
 
-REJUVINATION_INTERVAL = 1 # rejuvinations are made every this many time units 
+REJUVINATION_INTERVAL =  1# rejuvinations are made every this many time units 
 CENSORING_AGENTS_TO_ALL_CLIENTS = 0.05 # can be 0.05, 0.1, and 0.5
 CENSORING_AGENTS_TO_ALL_CLIENTS_BIRTH_PERIOD = 0.02
