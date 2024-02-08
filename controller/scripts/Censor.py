@@ -17,7 +17,7 @@ class OptimalCensor():
     
     def run(self, right_now):
         # Based on calcualtions of the chosen alpha and beta params
-        known_proxies = Assignment.objects.filter(client__in=self.agents, assignment_time__lt=right_now-4).values_list('proxy', flat=True).distinct()
+        known_proxies = Assignment.objects.filter(client__in=self.agents, assignment_time__lt=right_now-3).values_list('proxy', flat=True).distinct()
         known_proxies_good_for_blocking = Proxy.objects.filter(id__in=known_proxies, is_blocked=False, is_active=True)
         return known_proxies_good_for_blocking
     
