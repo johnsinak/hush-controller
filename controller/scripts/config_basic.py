@@ -20,6 +20,6 @@ NEW_USER_COUNT = 1
 NEW_PROXY_INTERVAL = 100 # 1 every 100 units
 NEW_PROXY_COUNT = 1
 
-REJUVINATION_INTERVAL = 1 # rejuvinations are made every this many time units 
+REJUVINATION_INTERVAL = 2 # rejuvinations are made every this many time units 
 CENSORING_AGENTS_TO_ALL_CLIENTS = 0.1 # can be 0.05, 0.1, and 0.5
 CENSORING_AGENTS_TO_ALL_CLIENTS_BIRTH_PERIOD = CENSORING_AGENTS_TO_ALL_CLIENTS * 0.4
