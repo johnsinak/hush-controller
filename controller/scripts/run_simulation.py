@@ -1,6 +1,7 @@
 from assignments.models import Client, Proxy, ProxyReport, Assignment
 from .Censor import *
 from .config_basic import *
+from .simulation_utils import request_new_proxy, request_new_proxy_new_client
 
 
 ############ CENSOR ############
@@ -48,3 +49,28 @@ def run_simulation(birth_period:bool):
 
 def run(*args):
     print("we're live baby!")
+    pr1 = Proxy.objects.create(ip=f'1.0.0.1', is_test=True, is_active=False)
+    pr2 = Proxy.objects.create(ip=f'1.0.0.2', is_test=True, is_blocked=True)
+    pr3 = Proxy.objects.create(ip=f'1.0.0.3', is_test=True)
+    pr4 = Proxy.objects.create(ip=f'1.0.0.4', is_test=True)
+    pr5 = Proxy.objects.create(ip=f'1.0.0.5', is_test=True)
+    pr6 = Proxy.objects.create(ip=f'1.0.0.6', is_test=True)
+    pr7 = Proxy.objects.create(ip=f'1.0.0.7', is_test=True)
+
+    cl1 = Client.objects.create(ip='2.2.2.2')
+    cl2 = Client.objects.create(ip='3.3.3.3', is_censor_agent=True)
+    request_new_proxy_new_client(cl1)
+    request_new_proxy_new_client(cl2)
+
+    # Assignment.objects.create(proxy=pr1, client=cl, assignment_time=4)
+    # Assignment.objects.create(proxy=pr2, client=cl, assignment_time=2)
+    # Assignment.objects.create(proxy=pr3, client=cl, assignment_time=5)
+    # Assignment.objects.create(proxy=pr5, client=cl, assignment_time=1)
+
+
+    print(request_new_proxy([cl1,cl2], 10))
+    print(request_new_proxy([cl1,cl2], 15))
+    print(request_new_proxy([cl1,cl2], 20))
+
+    # print(request_new_proxy('5.5.5.5'))
+    # print(request_new_proxy('5.5.5.5'))
