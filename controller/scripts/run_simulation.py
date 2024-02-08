@@ -11,7 +11,12 @@ from time import time
 def run_simulation():
     #TODO: change this
     # censor = AggresiveCensor()
-    censor = OptimalCensor()
+    if CENSOR_TYPE == "OPTIMAL":
+        print('optimal censor')
+        censor = OptimalCensor()
+    else:
+        print('aggressive censor')
+        censor = AggresiveCensor()
     duration = BIRTH_PERIOD + SIMULATION_DURATION
     last_created_proxy_ip = '0.0.0.0'
     last_created_client_id = -1
