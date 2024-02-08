@@ -30,23 +30,24 @@ def get_matched_clients(client_prefrences, proxy_prefrences, capacities):
 
     return assignment_results
 
+if __name__ == "__main__":
+    # run test
+    client_preferences = {
+        'client1': ['proxy1', 'proxy2', 'proxy3'],
+        'client2': ['proxy1', 'proxy2', 'proxy3'],
+        'client3': ['proxy2', 'proxy3', 'proxy1']
+    }
 
-client_preferences = {
-    'client1': ['proxy1', 'proxy2', 'proxy3'],
-    'client2': ['proxy1', 'proxy2', 'proxy3'],
-    'client3': ['proxy2', 'proxy3', 'proxy1']
-}
+    proxy_preferences = {
+        'proxy1': ['client2', 'client3', 'client1'],
+        'proxy2': ['client1', 'client3', 'client2'],
+        'proxy3': ['client2', 'client1', 'client3']
+    }
 
-proxy_preferences = {
-    'proxy1': ['client2', 'client3', 'client1'],
-    'proxy2': ['client1', 'client3', 'client2'],
-    'proxy3': ['client2', 'client1', 'client3']
-}
+    proxy_capacities = {
+        'proxy1': 1,
+        'proxy2': 2,
+        'proxy3': 1
+    }
 
-proxy_capacities = {
-    'proxy1': 1,
-    'proxy2': 2,
-    'proxy3': 1
-}
-
-print(get_matched_clients(client_preferences, proxy_preferences, proxy_capacities))
+    print(get_matched_clients(client_preferences, proxy_preferences, proxy_capacities))
