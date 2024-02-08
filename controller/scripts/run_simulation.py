@@ -17,6 +17,8 @@ def run_simulation():
     else:
         print('aggressive censor')
         censor = AggresiveCensor()
+    print(f'rej: {REJUVINATION_INTERVAL}')
+    print(f'censor rate: {CENSORING_AGENTS_TO_ALL_CLIENTS}')
     duration = BIRTH_PERIOD + SIMULATION_DURATION
     last_created_proxy_ip = '0.0.0.0'
     last_created_client_id = -1

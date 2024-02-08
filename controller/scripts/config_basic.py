@@ -14,7 +14,7 @@ CENSOR_UTILIZATION_RATIO = 0.4
 
 ############ RATES ############
 # for our reference: TIME_UNIT = 2 hour
-NEW_USER_RATE_INTERVAL = 3 # 1 user every 3 units
+NEW_USER_RATE_INTERVAL = 4 # 1 user every 3 units
 NEW_USER_COUNT = 1
 
 NEW_PROXY_INTERVAL = 100 # 1 every 100 units
