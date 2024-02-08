@@ -20,6 +20,7 @@ def run_simulation():
         if step < BIRTH_PERIOD:
             is_birth_period = True
 
+        # time1 = time()
         # Censor chooses what proxies of the ones they have to block
         blocked_clients = []
         #TODO: do the actual censors
@@ -31,6 +32,7 @@ def run_simulation():
             blocked_ip_list = Assignment.objects.filter(proxy=proxy).values_list('client', flat=True).distinct()
             blocked_clients.extend(list(Client.objects.filter(ip__in=blocked_ip_list)))
 
+        # time2 = time()
         # TODO: do the data recordings
         # Number of disconnected users are determined and recorded
         # ChartNonBlockedProxyRatio, ChartConnectedUsersRatio, ChartNonBlockedProxyCount
@@ -63,18 +65,20 @@ def run_simulation():
                 print('this happens once!')
                 connected_user_ratio = 0
             ChartConnectedUsersRatio.objects.create(value=connected_user_ratio, creation_time=step)
-
-
+        
+        # time3 = time()
         #   DONE: Rejuvinate
         if step % REJUVINATION_INTERVAL == 0:
             rejuvinate(step)
         
 
+        # time4 = time()
         #Done: at some point I should decide when the agents request for new proxies
         #   DONE: Affected clients (agent or not) request for new proxies and see if they're blocked or not.
         #   DONE: The get proxy algo gets run for every single client that was previously connected to those blocked proxies
         request_new_proxy(proposing_clients=blocked_clients, right_now=step)
 
+        # time5 = time()
         # DONE: New proxies (if any) get created
         if step % NEW_PROXY_INTERVAL == 0:
             for _ in range(NEW_PROXY_COUNT):
@@ -85,7 +89,10 @@ def run_simulation():
             for _ in range(NEW_USER_COUNT):
                 last_created_client_id = create_new_client(censor, last_created_client_id, is_birth_period, step)
         
-        
+        # time6 = time()
+
+        # times = [time2-time1, time3-time2, time4-time3, time5-time4, time6-time5]
+        # print(f"taking most time: {times.index(max(times))}")
         
 
 def rejuvinate(step):
