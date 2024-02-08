@@ -1,8 +1,8 @@
 ############ BASICS ############
-SIMULATION_DURATION = 3 * 365 * 24 # 3 years
-BIRTH_PERIOD = 1 * 365 * 24 # 1 year?
+SIMULATION_DURATION = 2 * 365 * 12 # 2 years 
+BIRTH_PERIOD =  365 * 6 # half a year?
 FLEET_SIZE = 10
-CLIENT_UTILITY_THRESHOLD = -300
+CLIENT_UTILITY_THRESHOLD = -2000
 WORLD_SIZE = 20000
 CENSORED_REGION_SIZE = 1000
 
@@ -10,11 +10,11 @@ MAX_PROXY_CAPACITY = 40
 CENSOR_UTILIZATION_RATIO = 0.4
 
 ############ RATES ############
-# for our reference: TIME_UNIT = 1 hour
-NEW_USER_RATE_INTERVAL = 1 # 1 user every 1 hour
+# for our reference: TIME_UNIT = 2 hour
+NEW_USER_RATE_INTERVAL = 2 # 1 user every 1 hour
 NEW_USER_COUNT = 1
 
-NEW_PROXY_INTERVAL = 30 # 1 every 30 hours
+NEW_PROXY_INTERVAL = 50 # 1 every 30 hours
 NEW_PROXY_COUNT = 1
 
 REJUVINATION_INTERVAL = 1 # rejuvinations are made every this many time units 

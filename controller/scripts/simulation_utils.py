@@ -24,6 +24,8 @@ def get_client_proxy_utilization(client, client_assignments, right_now):
             continue
         if assignment.proxy.is_blocked == True:
             clients_proxy_utilization += assignment.proxy.blocked_at - assignment.assignment_time
+        if assignment.proxy.is_active == False:
+            clients_proxy_utilization += assignment.proxy.deactivated_at - assignment.assignment_time
         else:
             clients_proxy_utilization += right_now - assignment.assignment_time
         proxy_checker[assignment.proxy.id] = True
@@ -33,14 +35,20 @@ def get_client_proxy_utilization(client, client_assignments, right_now):
     return clients_proxy_utilization
 
 
-def request_new_proxy_new_client(client):
+def request_new_proxy_new_client(client, right_now):
     chosen_proxy = Proxy.objects.filter(is_blocked=False, is_active=True, capacity__gt=0).all().first()
 
-    Assignment.objects.create(proxy=chosen_proxy, client=client)
+    Assignment.objects.create(proxy=chosen_proxy, client=client, assignment_time=right_now)
+    client.request_count += 1
+    client.save()
     if Assignment.objects.filter(proxy=chosen_proxy, client=client).count() == 1:
         chosen_proxy.capacity -= 1
         chosen_proxy.save()
     return chosen_proxy
+
+
+
+################### MAIN THING ###################
 
 def request_new_proxy(proposing_clients, right_now:int):
     client_prefrences = {}
@@ -49,7 +57,7 @@ def request_new_proxy(proposing_clients, right_now:int):
     flagged_clients = []
 
     active_proxies = Proxy.objects.filter(is_blocked=False, is_active=True, capacity__gt=0).all()
-
+    
     for proxy in active_proxies:
         utility_values_for_clients = {}
         alpha1, alpha2, alpha3, alpha4, alpha5 = 1 ,50, 2, 10, 10
@@ -61,16 +69,13 @@ def request_new_proxy(proposing_clients, right_now:int):
             client_assignments = Assignment.objects.filter(client=client).order_by('created_at')
             assigned_proxies_list = client_assignments.values_list('proxy', flat=True).distinct()
             known_blocked_proxies_for_client = Proxy.objects.filter(id__in=assigned_proxies_list, is_blocked=True)
-            known_proxies_for_client = Proxy.objects.filter(id__in=assigned_proxies_list)
             
             blocked_proxy_usage = 0
             for assignment in client_assignments:
                 if assignment.proxy.is_blocked == True:
                     blocked_proxy_usage += assignment.proxy.blocked_at - assignment.assignment_time
-
             number_of_blocked_proxies_that_a_user_knows = known_blocked_proxies_for_client.count()
-            number_of_requests_for_new_proxies = client_assignments.count()
-    
+            number_of_requests_for_new_proxies = client.request_count
             clients_proxy_utilization = get_client_proxy_utilization(client, client_assignments, right_now)
             distance = get_normalized_distance((proxy.latitude, proxy.longitude), (client.latitude, client.longitude))
             client_utility = alpha1 * min(clients_proxy_utilization, some_cap_value) \
@@ -104,17 +109,28 @@ def request_new_proxy(proposing_clients, right_now:int):
                             - beta4 * distance
             utility_values_for_proxies[proxy.ip] = proxy_utility
         client_prefrences[client.ip] = list(reversed(sorted(utility_values_for_proxies, key=lambda k: utility_values_for_proxies[k])))
-        
+
     matches = get_matched_clients(client_prefrences, proxy_prefrences, proxy_capacities)
 
+
     for proxy_id in matches.keys():
-        proxy = Proxy.objects.get(ip=proxy_id)
+        try:
+            proxy = Proxy.objects.get(ip=proxy_id)
+        except Exception as e:
+            print(e)
+            print(f"why the fuck is this duplicate? {proxy_id}")
+            exit()
         clients_accepted = matches[proxy_id]
         for client_ip in clients_accepted:
             client = Client.objects.get(ip=client_ip)
             Assignment.objects.create(proxy=proxy, client=client, assignment_time=right_now)
+            client.request_count += 1
+            client.save()
             if Assignment.objects.filter(proxy=proxy, client=client).count() == 1:
                     proxy.capacity -= 1
                     proxy.save()
-
-    return matches, flagged_clients
+    # return matches, flagged_clients
+    times = [time2-time1, time3-time2, time4-time3, time5-time4, time6-time5, time7-time6]
+    
+    print(f"taking most time: {times.index(max(times))} ||||||| {times}")
+    return flagged_clients

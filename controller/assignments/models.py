@@ -44,6 +44,7 @@ class Proxy(models.Model):
     is_blocked = models.BooleanField(default=False)
     blocked_at = models.IntegerField(default=0)
     is_active = models.BooleanField(default=True)
+    deactivated_at = models.IntegerField(default=0)
     latitude = models.FloatField(null=True)
     longitude = models.FloatField(null=True)
 
@@ -74,6 +75,7 @@ class Client(models.Model):
     user_agent = models.CharField(max_length=255, null=True, blank=True)
     latitude = models.FloatField(null=True)
     longitude = models.FloatField(null=True)
+    request_count = models.IntegerField(default=0)
 
     objects = ClientManager()
 
@@ -114,6 +116,8 @@ class Assignment(models.Model):
     )
     created_at = models.DateTimeField(auto_now_add=True)
     assignment_time = models.IntegerField(null=False, default=0)
+    from_migration = models.BooleanField(default=False)
+    is_expired = models.BooleanField(default=False)
 
 
 class IDClientCounter(models.Model):
@@ -135,3 +139,16 @@ class ProxyAvgMigrationTime(models.Model):
 class ControllerAvgMigrationTime(models.Model):
     value = models.FloatField()
     created_at = models.DateTimeField(auto_now_add=True)
+
+
+class ChartNonBlockedProxyRatio(models.Model):
+    value = models.FloatField()
+    creation_time = models.IntegerField()
+
+class ChartNonBlockedProxyCount(models.Model):
+    value = models.IntegerField()
+    creation_time = models.IntegerField()
+
+class ChartConnectedUsersRatio(models.Model):
+    value = models.FloatField()
+    creation_time = models.IntegerField()
