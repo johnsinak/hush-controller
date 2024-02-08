@@ -42,6 +42,7 @@ class Proxy(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     capacity = models.IntegerField(default=40)
     is_blocked = models.BooleanField(default=False)
+    blocked_at = models.IntegerField(default=0)
     is_active = models.BooleanField(default=True)
     latitude = models.FloatField(null=True)
     longitude = models.FloatField(null=True)
@@ -49,7 +50,7 @@ class Proxy(models.Model):
     objects = ProxyManager()
 
     def __str__(self):
-        return str(self.url)
+        return str(self.ip)
 
 
 class ClientManager(models.Manager):
@@ -68,6 +69,8 @@ class ClientManager(models.Manager):
 class Client(models.Model):
     ip = models.CharField(max_length=30, null=False, unique=True, primary_key=True)
     is_test = models.BooleanField(default=True)
+    is_censor_agent = models.BooleanField(default=False)
+    flagged = models.BooleanField(default=False)
     user_agent = models.CharField(max_length=255, null=True, blank=True)
     latitude = models.FloatField(null=True)
     longitude = models.FloatField(null=True)
@@ -110,6 +113,7 @@ class Assignment(models.Model):
         related_name="assigned",
     )
     created_at = models.DateTimeField(auto_now_add=True)
+    assignment_time = models.IntegerField(null=False, default=0)
 
 
 class IDClientCounter(models.Model):
