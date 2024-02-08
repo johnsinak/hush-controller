@@ -59,13 +59,13 @@ def request_new_proxy(proposing_clients, right_now:int):
     general_proxy_utilities = {}
     flagged_clients = []
 
-    # time1 = time()
+    time1 = time()
 
     active_proxies = Proxy.objects.filter(is_blocked=False, is_active=True, capacity__gt=0).all()
 
-    # time2 = time()
+    time2 = time()
 
-    alpha1, alpha2, alpha3, alpha4, alpha5 = 1 ,2, 1, 6, 10
+    alpha1, alpha2, alpha3, alpha4, alpha5 = 4 ,1, 1, 10, 10
     some_cap_value = 50 * 24
     for client in proposing_clients:
         if client.flagged == True:
@@ -88,7 +88,7 @@ def request_new_proxy(proposing_clients, right_now:int):
                         - alpha4 * number_of_blocked_proxies_that_a_user_knows
         general_client_utilities[client.ip] = client_utility
     
-    # time3 = time()
+    time3 = time()
 
     for proxy in active_proxies:
         utility_values_for_clients = {}
@@ -107,7 +107,7 @@ def request_new_proxy(proposing_clients, right_now:int):
         proxy_prefrences[proxy.ip] = list(reversed(sorted(utility_values_for_clients, key=lambda k: utility_values_for_clients[k])))
         proxy_capacities[proxy.ip] = proxy.capacity
 
-    # time4 = time()
+    time4 = time()
 
     beta1, beta2, beta3, beta4 = 1,1,1,1
     for proxy in active_proxies:
@@ -131,11 +131,11 @@ def request_new_proxy(proposing_clients, right_now:int):
             utility_values_for_proxies[proxy.ip] = proxy_utility
         client_prefrences[client.ip] = list(reversed(sorted(utility_values_for_proxies, key=lambda k: utility_values_for_proxies[k])))
 
-    # time5 = time()
+    time5 = time()
 
     matches = get_matched_clients(client_prefrences, proxy_prefrences, proxy_capacities)
 
-    # time6 = time()
+    time6 = time()
 
     for proxy_id in matches.keys():
         proxy = Proxy.objects.get(ip=proxy_id)
@@ -149,7 +149,7 @@ def request_new_proxy(proposing_clients, right_now:int):
             # if Assignment.objects.filter(proxy=proxy, client=client).count() == 1:
 
     
-    # time7 = time()
+    time7 = time()
 
     # times = [time2-time1, time3-time2, time4-time3, time5-time4, time6-time5, time7-time6]
     # print(f"taking most time: {times.index(max(times))} ||||||| {times}")
