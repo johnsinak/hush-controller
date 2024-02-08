@@ -65,7 +65,7 @@ def request_new_proxy(proposing_clients, right_now:int):
 
     # time2 = time()
 
-    alpha1, alpha2, alpha3, alpha4, alpha5 = 1 ,1, 1, 1, 10
+    alpha1, alpha2, alpha3, alpha4, alpha5 = 2 ,1, 1, 2, 10
     some_cap_value = 1000 * 24
     for client in proposing_clients:
         if client.flagged == True:
