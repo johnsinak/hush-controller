@@ -10,7 +10,8 @@ from time import time
 
 def run_simulation():
     #TODO: change this
-    censor = AggresiveCensor()
+    # censor = AggresiveCensor()
+    censor = OptimalCensor()
     duration = BIRTH_PERIOD + SIMULATION_DURATION
     last_created_proxy_ip = '0.0.0.0'
     last_created_client_id = -1
@@ -25,7 +26,7 @@ def run_simulation():
         # Censor chooses what proxies of the ones they have to block
         blocked_clients = []
         #TODO: do the actual censors
-        list_of_proxies_to_be_blocked = censor.run()
+        list_of_proxies_to_be_blocked = censor.run(step)
         for proxy in list_of_proxies_to_be_blocked:
             proxy.is_blocked = True
             proxy.blocked_at = step
