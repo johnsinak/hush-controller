@@ -1,4 +1,5 @@
 from random import random
+from django.db.models import F
 from tqdm import tqdm
 from assignments.models import Client, Proxy, Assignment, ChartNonBlockedProxyRatio, ChartConnectedUsersRatio, ChartNonBlockedProxyCount
 from .Censor import *
@@ -20,7 +21,7 @@ def run_simulation():
         if step < BIRTH_PERIOD:
             is_birth_period = True
 
-        time1 = time()
+        # time1 = time()
         # Censor chooses what proxies of the ones they have to block
         blocked_clients = []
         #TODO: do the actual censors
@@ -30,9 +31,11 @@ def run_simulation():
             proxy.blocked_at = step
             proxy.save()
             blocked_ip_list = Assignment.objects.filter(proxy=proxy).values_list('client', flat=True).distinct()
-            blocked_clients.extend(list(Client.objects.filter(ip__in=blocked_ip_list)))
+            affected_clients = Client.objects.filter(ip__in=blocked_ip_list)
+            affected_clients.update(known_blocked_proxies=F('known_blocked_proxies') + 1)
+            blocked_clients.extend(list(affected_clients))
 
-        time2 = time()
+        # time2 = time()
         # TODO: do the data recordings
         # Number of disconnected users are determined and recorded
         # ChartNonBlockedProxyRatio, ChartConnectedUsersRatio, ChartNonBlockedProxyCount
@@ -66,19 +69,19 @@ def run_simulation():
                 connected_user_ratio = 0
             ChartConnectedUsersRatio.objects.create(value=connected_user_ratio, creation_time=step)
         
-        time3 = time()
+        # time3 = time()
         #   DONE: Rejuvinate
         if step % REJUVINATION_INTERVAL == 0:
             rejuvinate(step)
         
 
-        time4 = time()
+        # time4 = time()
         #Done: at some point I should decide when the agents request for new proxies
         #   DONE: Affected clients (agent or not) request for new proxies and see if they're blocked or not.
         #   DONE: The get proxy algo gets run for every single client that was previously connected to those blocked proxies
         request_new_proxy(proposing_clients=blocked_clients, right_now=step)
 
-        time5 = time()
+        # time5 = time()
         # DONE: New proxies (if any) get created
         if step % NEW_PROXY_INTERVAL == 0:
             for _ in range(NEW_PROXY_COUNT):
@@ -89,7 +92,7 @@ def run_simulation():
             for _ in range(NEW_USER_COUNT):
                 last_created_client_id = create_new_client(censor, last_created_client_id, is_birth_period, step)
         
-        time6 = time()
+        # time6 = time()
 
         # times = [time2-time1, time3-time2, time4-time3, time5-time4, time6-time5]
         # print(f"taking most time: {times.index(max(times))} ||||||| {times}")
@@ -108,10 +111,6 @@ def rejuvinate(step):
             Assignment.objects.filter(proxy=proxy).delete()
         # proxy.deactivated_at = step
         proxy.save()
-        
-        #TODO: maybe we should cut access to the assignment for censoring agents if they block something
-        # client_ips = list(Assignment.objects.filter(proxy=proxy, client).values_list('client', flat=True).distinct())
-        # clients = Client.objects.filter(ip__in=client_ips, )
 
 
 def get_migration_proxies_ip(old_ip):
@@ -149,10 +148,10 @@ def create_new_client(censor, last_created_client_id, is_birth_period, step):
         censor_chance = CENSORING_AGENTS_TO_ALL_CLIENTS_BIRTH_PERIOD
 
     if random() < censor_chance:
-        cl = Client.objects.create(ip=ip, is_censor_agent=True)
+        cl = Client.objects.create(ip=ip, is_censor_agent=True, creation_time=step)
         censor.agents.append(cl)
     else: 
-        cl = Client.objects.create(ip=ip)
+        cl = Client.objects.create(ip=ip, creation_time=step)
 
     request_new_proxy_new_client(cl, step)
 

@@ -76,6 +76,8 @@ class Client(models.Model):
     latitude = models.FloatField(null=True)
     longitude = models.FloatField(null=True)
     request_count = models.IntegerField(default=0)
+    known_blocked_proxies = models.IntegerField(default=0)
+    creation_time = models.IntegerField(default=0)
 
     objects = ClientManager()
 
