@@ -5,20 +5,21 @@ from assignments.models import Client, Proxy, Assignment, ChartNonBlockedProxyRa
 from .Censor import *
 from .config_basic import *
 from .simulation_utils import request_new_proxy, request_new_proxy_new_client
-from time import time
+from time import time, sleep
+import os
 
 
-def run_simulation():
+def run_simulation(censor_type, censoring_agent_ratio, censoring_agent_ratio_birth_period, rejuvination_interval):
     #TODO: change this
     # censor = AggresiveCensor()
-    if CENSOR_TYPE == "OPTIMAL":
+    if censor_type == "OPTIMAL":
         print('optimal censor')
         censor = OptimalCensor()
     else:
         print('aggressive censor')
         censor = AggresiveCensor()
-    print(f'rej: {REJUVINATION_INTERVAL}')
-    print(f'censor rate: {CENSORING_AGENTS_TO_ALL_CLIENTS}')
+    print(f'rej: {rejuvination_interval}')
+    print(f'censor rate: {censoring_agent_ratio}')
     duration = BIRTH_PERIOD + SIMULATION_DURATION
     last_created_proxy_ip = '0.0.0.0'
     last_created_client_id = -1
@@ -48,7 +49,7 @@ def run_simulation():
         # Number of disconnected users are determined and recorded
         # ChartNonBlockedProxyRatio, ChartConnectedUsersRatio, ChartNonBlockedProxyCount
         # IF the rejuvination interval > 1 then count blocked proxies on intervals where there are no rejuvs
-        if REJUVINATION_INTERVAL > 1 and step % REJUVINATION_INTERVAL != 0:
+        if rejuvination_interval > 1 and step % rejuvination_interval != 0:
             all_active_proxies_count = Proxy.objects.filter(is_active=True).count()
             blocked_proxies_count = Proxy.objects.filter(is_active=True, is_blocked=True).count()
             nonblocked_ratio = (all_active_proxies_count - blocked_proxies_count) / all_active_proxies_count
@@ -79,7 +80,7 @@ def run_simulation():
         
         # time3 = time()
         #   DONE: Rejuvinate
-        if step % REJUVINATION_INTERVAL == 0:
+        if step % rejuvination_interval == 0:
             rejuvinate(step)
         
 
@@ -98,7 +99,7 @@ def run_simulation():
         # DONE: New clients get added (censor agent with chance of censoring agent)
         if step % NEW_USER_RATE_INTERVAL == 0:
             for _ in range(NEW_USER_COUNT):
-                last_created_client_id = create_new_client(censor, last_created_client_id, is_birth_period, step)
+                last_created_client_id = create_new_client(censor, last_created_client_id, is_birth_period, step, censoring_agent_ratio, censoring_agent_ratio_birth_period)
         
         # time6 = time()
 
@@ -143,7 +144,7 @@ def create_new_proxy(last_created_proxy_ip):
     Proxy.objects.create(ip=last_created_proxy_ip, is_test=True)
     return last_created_proxy_ip
 
-def create_new_client(censor, last_created_client_id, is_birth_period, step):
+def create_new_client(censor, last_created_client_id, is_birth_period, step, censoring_agent_ratio, censoring_agent_ratio_birth_period):
     client_ip_template = '255.{}.{}.{}'
     client_id = last_created_client_id + 1
     num1 = client_id // (256 * 256)
@@ -151,9 +152,9 @@ def create_new_client(censor, last_created_client_id, is_birth_period, step):
     num3 = client_id % 256
     ip = client_ip_template.format(num1,num2,num3)
 
-    censor_chance = CENSORING_AGENTS_TO_ALL_CLIENTS
+    censor_chance = censoring_agent_ratio
     if is_birth_period:
-        censor_chance = CENSORING_AGENTS_TO_ALL_CLIENTS_BIRTH_PERIOD
+        censor_chance = censoring_agent_ratio_birth_period
 
     if random() < censor_chance:
         cl = Client.objects.create(ip=ip, is_censor_agent=True, creation_time=step)
@@ -168,16 +169,28 @@ def create_new_client(censor, last_created_client_id, is_birth_period, step):
 
 def run(*args):
     ############ CENSOR ############
-    run_simulation()
-    nonblockedproxyratio = list(ChartNonBlockedProxyRatio.objects.all().values_list('value', flat=True))
-    nonblockedproxycount = list(ChartNonBlockedProxyCount.objects.all().values_list('value', flat=True))
-    connecteduserratio = list(ChartConnectedUsersRatio.objects.all().values_list('value', flat=True))
-    with open('results.csv', 'w') as f:
-        f.write('nonblocked_proxy_ratio,nonblocked_proxy_count,connected_user_ratio\n')
-        for i in range(len(nonblockedproxycount)):
-            f.write(f'{nonblockedproxyratio[i]},{nonblockedproxycount[i]},{connecteduserratio[i]}\n')
+    CENSOR_TYPE = ["OPTIMAL", "AGGRESIVE"] # OPTIMAL or AGGRESIVE
+    REJUVINATION_INTERVAL = [1, 2] # rejuvinations are made every this many time units 
+    CENSORING_AGENTS_TO_ALL_CLIENTS = [0.05, 0.1, 0.5] # can be 0.05, 0.1, and 0.5
+    CENSORING_AGENTS_TO_ALL_CLIENTS_BIRTH_PERIOD_ratio = 0.4
 
-    print('done')
+    for censoring_agent_ratio in CENSORING_AGENTS_TO_ALL_CLIENTS:
+        for censor_type in CENSOR_TYPE:
+            for rejuvination_interval in REJUVINATION_INTERVAL:
+                run_simulation(censor_type, censoring_agent_ratio, censoring_agent_ratio * CENSORING_AGENTS_TO_ALL_CLIENTS_BIRTH_PERIOD_ratio, rejuvination_interval)
+                nonblockedproxyratio = list(ChartNonBlockedProxyRatio.objects.all().values_list('value', flat=True))
+                nonblockedproxycount = list(ChartNonBlockedProxyCount.objects.all().values_list('value', flat=True))
+                connecteduserratio = list(ChartConnectedUsersRatio.objects.all().values_list('value', flat=True))
+                with open(f'../results/results_{censor_type}_rej{rejuvination_interval}_cens{censoring_agent_ratio}.csv', 'w') as f:
+                    f.write('nonblocked_proxy_ratio,nonblocked_proxy_count,connected_user_ratio\n')
+                    for i in range(len(nonblockedproxycount)):
+                        f.write(f'{nonblockedproxyratio[i]},{nonblockedproxycount[i]},{connecteduserratio[i]}\n')
+
+                print('done')
+                os.system("python3 manage.py flush --no-input")
+                # os.system("python3 manage.py migrate")
+                sleep(3)
+                print('ready to go')
 
     # print(Client.objects.all().count())
     # print('flagged clients:')
